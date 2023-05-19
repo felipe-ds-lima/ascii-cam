@@ -54,9 +54,9 @@ const start = async () => {
         await delay(10)
         endFrame = Date.now()
         timeElapsed += endFrame - startFrame
-        let time = (1000 / (endFrame - startFrame)).toFixed(0)
-        if(fpsEl.innerHTML != time) {
-            fpsEl.innerHTML = time;
+        let fps = "FPS: " + (1000 / (endFrame - startFrame)).toFixed(0)
+        if(fpsEl.innerHTML != fps) {
+            fpsEl.innerHTML = fps;
         }
     }
 }
@@ -87,7 +87,7 @@ function transformInText() {
             pixels[line][col].innerHTML = digit
         }
         col++
-        if (i % (4 * PIXEL_RATIO) === PIXEL_RATIO - 4) {
+        if (i % (4 * PIXEL_RATIO) === (PIXEL_RATIO * 4) - 4) {
             line++
             col = 0
         }
