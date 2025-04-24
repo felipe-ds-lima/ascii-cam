@@ -2,12 +2,12 @@ const canvasEl = document.getElementById("canvas")
 const resulEl = document.getElementById("result")
 const videoEl = document.getElementById("video")
 const context = canvasEl.getContext('2d')
+const copyEl = document.getElementById("copy")
 
-const PIXEL_RATIO = 100
+const PIXEL_RATIO = 150
 
 context.translate(PIXEL_RATIO, 0)
 context.scale(-1, 1)
-const pixels = []
 
 const delay = (time) => {
     return new Promise((resolve) => {
@@ -29,19 +29,6 @@ navigator.mediaDevices.getUserMedia({
 })
 
 const start = async () => {
-    for(let y = 0; y < PIXEL_RATIO; y++) {
-        const trEl = document.createElement('tr')
-        const pixelLine = []
-        for(let x = 0; x < PIXEL_RATIO; x++) {
-            const tdEl = document.createElement('td')
-            tdEl.id = "col-" + y + "-" + x
-            trEl.append(tdEl)
-            pixelLine.push(tdEl)
-        }
-        resulEl.append(trEl)
-        pixels.push(pixelLine)
-    }
-
     let timeElapsed = 0
     let startFrame = Date.now()
     let endFrame = Date.now()
@@ -50,7 +37,8 @@ const start = async () => {
     while(true) {
         startFrame = Date.now()
         context.drawImage(videoEl, 0, 0, PIXEL_RATIO, PIXEL_RATIO)
-        transformInText()
+        const text = transformInText()
+        resulEl.innerHTML = text
         await delay(10)
         endFrame = Date.now()
         timeElapsed += endFrame - startFrame
@@ -62,8 +50,8 @@ const start = async () => {
 }
 
 function transformInText() {
+    let text = ""
     const imageData = context.getImageData(0, 0, PIXEL_RATIO, PIXEL_RATIO)
-
     let line = 0
     let col = 0
     for (let i = 0; i < imageData.data.length; i += 4) {
@@ -82,14 +70,19 @@ function transformInText() {
             digit = '*'
         }
 
-
-        if(pixels[line][col].innerHTML != digit) {
-            pixels[line][col].innerHTML = digit
-        }
         col++
+
+        text += digit
         if (i % (4 * PIXEL_RATIO) === (PIXEL_RATIO * 4) - 4) {
+            text += "\n"
             line++
             col = 0
         }
     }
+    return text
 }
+
+copyEl.addEventListener("click", () => {
+    navigator.clipboard.writeText(`\`\`\`\n${resulEl.innerHTML}\n\`\`\``)
+})
+
